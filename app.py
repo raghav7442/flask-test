@@ -85,7 +85,8 @@ class AiSensyAPI:
         self.api_url = "https://api.aisensy.com/send-message"
         self.auth_header = {
             'Authorization': os.getenv('AISENSY_API_KEY'),
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': "application/json",
         }
 
     def send_message(self, to, message):
