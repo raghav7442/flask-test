@@ -1,0 +1,30 @@
+
+
+name: Backend CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy using ssh
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /var/www/node/MethewL_whatsaspp
+            git pull origin main
+            git status
+            python --version
+            ls -l
+            source venv/bin/activate
+            pip install -r requirements.txt
+            pm2 reload 18
+            deactivate

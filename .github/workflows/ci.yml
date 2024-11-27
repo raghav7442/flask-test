@@ -1,0 +1,19 @@
+
+
+name: Python CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - run: pip install -r requirements.txt
