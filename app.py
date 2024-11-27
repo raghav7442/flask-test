@@ -128,8 +128,11 @@ app.secret_key = "supersecretkey"
 assistant = WatchSellingAssistant()
 whatsapp_api = WhatsAppAPI(assistant)
 
-@app.route('/userChat', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
+def check():
+    return "API IS RUNNING FINE", 200
 
+@app.route('/userChat', methods=['GET', 'POST'])
 def user_chat():
     print(request)
     if request.method == 'GET':
@@ -178,4 +181,4 @@ def user_chat():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    app.run(debug=True, port=5000)
+    app.run(debug=True,host='0.0.0.0', port=5000)
