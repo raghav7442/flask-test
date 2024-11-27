@@ -1,2 +1,4 @@
+openai
+python-dotenv
 flask
 requests==2.32.3
