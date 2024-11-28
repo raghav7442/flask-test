@@ -152,18 +152,19 @@ def user_chat():
                 # Extract WhatsApp ID and message details
                 wa_id = str(data['data']['message']['phone_number'])
         
-                message_info = data['data']['message']['message_content']['text']
+                message_info = data['data']['message']['message_content']
                 # image=data['data']['message']['message_content']['url']
                 logging.info(f"mobile number- {wa_id}, \n message- {message_info}")
 
                 if message_info['type'] == 'text':
-                    body_content = message_info['text']['body']
+                    body_content = message_info['text']
                     assistant_response = assistant.get_assistant_response(wa_id, body_content)
                     whatsapp_api.send_message(wa_id, assistant_response)
+                    logging.info(assistant_response)
                     return jsonify({"message": "Text processed"}), 200
 
                 elif message_info['type'] == 'url':
-                    image_ids_list = [message['url'] for message in data['data']['message']['message_content']]
+                    image_ids_list = [message['url'] for message in data['data']['message']['message_content']['url']]
                     get_image(wa_id, image_ids_list)
                     process_images(wa_id)
                     response_message = "Thanks for sharing the image; our team will contact you shortly."
