@@ -75,6 +75,9 @@ class WatchSellingAssistant:
             )
             assistant_reply = response.choices[0].message.content.strip()
             self.save_to_memory(wa_id, prompt, assistant_reply)
+
+            print(f"Assistant's response: {assistant_reply}")
+
             return assistant_reply
         except Exception as e:
             logging.error(f"OpenAI API request failed: {e}")
@@ -138,7 +141,7 @@ def user_chat():
     logging.info(request)
     if request.method == 'GET':
         challenge = request.args.get('challenge')
-        print( challenge)
+        print(challenge)
         if challenge:
             return challenge, 200
         return "No challenge", 400
@@ -151,20 +154,17 @@ def user_chat():
             try:
                 # Extract WhatsApp ID and message details
                 wa_id = str(data['data']['message']['phone_number'])
-        
-                message_info = data['data']['message']['message_content']
-                # image=data['data']['message']['message_content']['url']
+                message_info = data['data']['message']['message_content']['text']
                 logging.info(f"mobile number- {wa_id}, \n message- {message_info}")
 
                 if message_info['type'] == 'text':
-                    body_content = message_info['text']
-                    assistant_response = assistant.get_assistant_response(wa_id, body_content)
+                    assistant_response = assistant.get_assistant_response(wa_id, message_info)  # Get the response from assistant
+                    logging.info(f"Assistant's response: {assistant_response}")  # Log the assistant's response
                     whatsapp_api.send_message(wa_id, assistant_response)
-                    logging.info(assistant_response)
                     return jsonify({"message": "Text processed"}), 200
 
                 elif message_info['type'] == 'url':
-                    image_ids_list = [message['url'] for message in data['data']['message']['message_content']['url']]
+                    image_ids_list = [message['url'] for message in data['data']['message']['message_content']]
                     get_image(wa_id, image_ids_list)
                     process_images(wa_id)
                     response_message = "Thanks for sharing the image; our team will contact you shortly."
@@ -184,6 +184,7 @@ def user_chat():
 
         else:
             return jsonify({"error": "Unsupported Media Type"}), 415
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
