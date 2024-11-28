@@ -134,7 +134,7 @@ def check():
 
 @app.route('/userChat', methods=['GET', 'POST'])
 def user_chat():
-    print(request)
+    print(f"get {request}")
     if request.method == 'GET':
         challenge = request.args.get('challenge')
         print( challenge)
@@ -145,11 +145,13 @@ def user_chat():
     elif request.method == 'POST':
         if request.is_json:
             data = request.json
-            print(data)
+            print(f"post {request}")
             try:
                 # Extract WhatsApp ID and message details
-                wa_id = data['entry'][0]['changes'][0]['value']['contacts'][0]['wa_id']
-                message_info = data['entry'][0]['changes'][0]['value']['messages'][0]
+                wa_id = data['data']['message']['phone_number']
+        
+                message_info = data['data']['message']['message_content']['text']
+                print(f"mobile number- {wa_id}, \n message- {message_info}")
 
                 if message_info['type'] == 'text':
                     body_content = message_info['text']['body']

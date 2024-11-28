@@ -19,7 +19,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            cd /var/www/node/MethewL_whatsaspp
+            cd flask-test
             git pull origin main
             git status
             python --version
