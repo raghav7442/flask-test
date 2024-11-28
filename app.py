@@ -38,7 +38,7 @@ class WatchSellingAssistant:
         return ""
 
     def get_assistant_response(self, wa_id, prompt):
-        try:
+
             history = self.load_from_memory(wa_id)
             messages = [
                 {"role": "system", "content": """You are a professional and friendly assistant helping users sell their watches. You should guide the conversation naturally, like a human watch dealer. remember you are the selling plate form, you cannot suggest client to hike the price, if the client gives you price according to it, you will send thank you message like, thank you for all the information, let me confirm with all my team and they will get back to you..
@@ -79,9 +79,9 @@ class WatchSellingAssistant:
             print(f"Assistant's response: {assistant_reply}")
 
             return assistant_reply
-        except Exception as e:
-            logging.error(f"OpenAI API request failed: {e}")
-            return "I'm sorry, but I couldn't process your request at the moment."
+        # except Exception as e:
+        #     logging.error(f"OpenAI API request failed: {e}")
+        #     return "I'm sorry, but I couldn't process your request at the moment."
 
 class AiSensyAPI:
     def __init__(self):
