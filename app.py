@@ -38,22 +38,32 @@ class WatchSellingAssistant:
         return ""
 
     def get_assistant_response(self, wa_id, prompt):
-
+        try:
             history = self.load_from_memory(wa_id)
             messages = [
                 {"role": "system", "content": """You are a professional and friendly assistant helping users sell their watches. You should guide the conversation naturally, like a human watch dealer. remember you are the selling plate form, you cannot suggest client to hike the price, if the client gives you price according to it, you will send thank you message like, thank you for all the information, let me confirm with all my team and they will get back to you..
-             Here's the flow you should follow: 
-             1. Greet the user warmly and ask how you can assist them. 
-             2. If the user mentions selling a watch, ask for the model of the watch. 
-             3. Once the model is provided, compliment the watch and ask for the year of purchase. 
-            4. then ask if they have a price in mind
-             5. Do you have original box and bill and warranty card with you? 
-             6. do you have any ovbious marks scratches in your watch,
-             7. Are you urgent in wanting to sell it? 
-             8. If the user provides a price, thank them and let them know you'll confirm the details. 
-             9. Got it, let me confirm some details with my team, can you send a photo of the watch??
-            10.thank you for all the info let me share all the details according to you and get back to you. Throughout, maintain a friendly and professional tone, keeping the conversation respectful and smooth."""},
-                
+
+                Here's the flow you should follow:
+
+                1. Greet the user warmly and ask how you can assist them.
+
+                2. If the user mentions selling a watch, ask for the model of the watch.
+
+                3. Once the model is provided, compliment the watch and ask for the year of purchase.
+
+                4. then ask if they have a price in mind
+
+                5. Do you have original box and bill and warranty card with you?
+
+                6. do you have any ovbious marks scratches in your watch,
+
+                7. Are you urgent in wanting to sell it?
+
+                8. If the user provides a price, thank them and let them know you'll confirm the details.
+
+                9. Got it, let me confirm some details with my team, can you send a photo of the watch??
+
+                10.thank you for all the info let me share all the details according to you and get back to you. Throughout, maintain a friendly and professional tone, keeping the conversation respectful and smooth."""}
             ]
             
             if history:
@@ -76,12 +86,13 @@ class WatchSellingAssistant:
             assistant_reply = response.choices[0].message.content.strip()
             self.save_to_memory(wa_id, prompt, assistant_reply)
 
-            print(f"Assistant's response: {assistant_reply}")
+            logging.info(f"Assistant's response: {assistant_reply}")
 
             return assistant_reply
-        # except Exception as e:
-        #     logging.error(f"OpenAI API request failed: {e}")
-        #     return "I'm sorry, but I couldn't process your request at the moment."
+        except Exception as e:
+            logging.error(f"OpenAI API request failed: {e}")
+            return "I'm sorry, but I couldn't process your request at the moment."
+
 
 class AiSensyAPI:
     def __init__(self):
@@ -114,6 +125,7 @@ class AiSensyAPI:
             logging.error(f"Exception occurred while sending message: {e}")
             return False
 
+
 class WhatsAppAPI:
     def __init__(self, assistant):
         self.assistant = assistant
@@ -126,22 +138,23 @@ class WhatsAppAPI:
         else:
             logging.error(f"Failed to send message to {to}")
 
+
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 assistant = WatchSellingAssistant()
 whatsapp_api = WhatsAppAPI(assistant)
 
+
 @app.route('/', methods=['GET'])
 def check():
     return "API IS RUNNING FINE", 200
 
+
 @app.route('/userChat', methods=['GET', 'POST'])
 def user_chat():
-    logging.info("get ")
-    logging.info(request)
+    logging.info("Received request")
     if request.method == 'GET':
         challenge = request.args.get('challenge')
-        print(challenge)
         if challenge:
             return challenge, 200
         return "No challenge", 400
@@ -149,43 +162,53 @@ def user_chat():
     elif request.method == 'POST':
         if request.is_json:
             data = request.json
-            logging.info("post method")
-            logging.info(request)
+            logging.info(f"Incoming data: {data}")
             try:
-                # Extract WhatsApp ID and message details
-                wa_id = str(data['data']['message']['phone_number'])
-                message_info = data['data']['message']['message_content']['text']
-                logging.info(f"mobile number- {wa_id}, \n message- {message_info}")
+                # Validate and parse data
+                if 'data' in data and 'message' in data['data']:
+                    message_data = data['data']['message']
+                    if isinstance(message_data, dict):
+                        wa_id = str(message_data.get('phone_number', ''))
+                        message_content = message_data.get('message_content', {})
+                        if isinstance(message_content, dict):
+                            message_type = message_content.get('type', '')
+                            message_text = message_content.get('text', '')
 
-                if message_info['type'] == 'text':
-                    assistant_response = assistant.get_assistant_response(wa_id, message_info)  # Get the response from assistant
-                    logging.info(f"Assistant's response: {assistant_response}")  # Log the assistant's response
-                    whatsapp_api.send_message(wa_id, assistant_response)
-                    return jsonify({"message": "Text processed"}), 200
+                            if message_type == 'text':
+                                assistant_response = assistant.get_assistant_response(wa_id, message_text)
+                                whatsapp_api.send_message(wa_id, assistant_response)
+                                return jsonify({"message": "Text processed"}), 200
 
-                elif message_info['type'] == 'url':
-                    image_ids_list = [message['url'] for message in data['data']['message']['message_content']]
-                    get_image(wa_id, image_ids_list)
-                    process_images(wa_id)
-                    response_message = "Thanks for sharing the image; our team will contact you shortly."
-                    whatsapp_api.send_message(wa_id, response_message)
-                    return jsonify({"message": "Image processed"}), 200
+                            elif message_type == 'url':
+                                image_ids_list = [msg.get('url') for msg in message_content.get('urls', [])]
+                                get_image(wa_id, image_ids_list)
+                                process_images(wa_id)
+                                response_message = "Thanks for sharing the image; our team will contact you shortly."
+                                whatsapp_api.send_message(wa_id, response_message)
+                                return jsonify({"message": "Image processed"}), 200
 
+                            else:
+                                logging.error(f"Unhandled message type: {message_type}")
+                                return jsonify({"error": "Unhandled message type"}), 400
+                        else:
+                            logging.error("Invalid message_content format")
+                            return jsonify({"error": "Invalid message_content format"}), 400
+                    else:
+                        logging.error("Invalid message structure")
+                        return jsonify({"error": "Invalid message structure"}), 400
                 else:
-                    return jsonify({"error": "Unhandled message type"}), 400
-
-            except (KeyError, IndexError) as e:
-                logging.error(f"Error extracting data: {e}")
-                return jsonify({"error": "Invalid data format"}), 400
+                    logging.error("Invalid data structure")
+                    return jsonify({"error": "Invalid data structure"}), 400
 
             except Exception as e:
                 logging.error(f"Error processing message: {e}")
                 return jsonify({"error": "Failed to process message"}), 500
 
         else:
+            logging.error("Unsupported Media Type")
             return jsonify({"error": "Unsupported Media Type"}), 415
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    app.run(debug=True,host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
