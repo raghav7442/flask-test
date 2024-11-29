@@ -82,18 +82,19 @@ class WatchSellingAssistant:
 
 class AiSensyAPI:
     def __init__(self):
-        self.api_url = "https://api.aisensy.com/send-message"
+        self.api_url = f"https://apis.aisensy.com/project-apis/v1/project/{os.getenv('AISENSY_PROJECT_ID')}/messages"
+        
         self.auth_header = {
-            'Authorization': os.getenv('AISENSY_API_KEY'),
+            'X-AiSensy-Project-API-Pwd': os.getenv('AISENSY_APP_PWD'),
             'Content-Type': 'application/json',
             'Accept': "application/json",
         }
 
     def send_message(self, to, message):
         payload = json.dumps({
-            "recipient_type": "individual",
             "to": to,
             "type": "text",
+            "recipient_type": "individual",
             "text": {
                 "body": message
             }
@@ -134,9 +135,9 @@ def check():
 
 @app.route('/userChat', methods=['GET', 'POST'])
 def user_chat():
+    logging.info("get ")
     logging.info(request)
     if request.method == 'GET':
-        logging.info("get ")
         challenge = request.args.get('challenge')
         print( challenge)
         if challenge:
@@ -152,18 +153,23 @@ def user_chat():
                 # Extract WhatsApp ID and message details
                 wa_id = str(data['data']['message']['phone_number'])
         
-                message_info = data['data']['message']['message_content']['text']
-                # image=data['data']['message']['message_content']['url']
-                logging.info(f"mobile number- {wa_id}, \n message- {message_info}")
+                #message_info = data['data']['message']['message_content']['text']
+                message_type = data['data']['message']['message_type']
 
-                if message_info['type'] == 'text':
-                    body_content = message_info['text']['body']
+                # image=data['data']['message']['message_content']['url']
+                logging.info(f"mobile number- {wa_id}")
+
+                if message_type == 'TEXT':
+                    body_content = data['data']['message']['message_content']['text']
                     assistant_response = assistant.get_assistant_response(wa_id, body_content)
+                    print(f"assistant_response\n {assistant_response}")
+
+
                     whatsapp_api.send_message(wa_id, assistant_response)
                     return jsonify({"message": "Text processed"}), 200
 
-                elif message_info['type'] == 'url':
-                    image_ids_list = [message['url'] for message in data['data']['message']['message_content']]
+                elif message_type == 'IMAGE':
+                    image_ids_list = data['data']['message']['message_content']['url']
                     get_image(wa_id, image_ids_list)
                     process_images(wa_id)
                     response_message = "Thanks for sharing the image; our team will contact you shortly."
