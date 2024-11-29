@@ -134,9 +134,9 @@ def check():
 
 @app.route('/userChat', methods=['GET', 'POST'])
 def user_chat():
-    logging.info("get ")
     logging.info(request)
     if request.method == 'GET':
+        logging.info("get ")
         challenge = request.args.get('challenge')
         print( challenge)
         if challenge:
