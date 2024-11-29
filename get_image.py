@@ -13,6 +13,7 @@ def get_image(wa_id, image_ids):
     
     # Ensure AUTH token is set
     auth_token = os.getenv("AUTH")
+    print(auth_token)
     if not auth_token:
         logging.error("Error: AUTH token not found")
         return

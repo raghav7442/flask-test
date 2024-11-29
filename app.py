@@ -148,7 +148,7 @@ def user_chat():
         if request.is_json:
             data = request.json
             logging.info("post method")
-            logging.info(request)
+            # logging.info(request)
             try:
                 # Extract WhatsApp ID and message details
                 wa_id = str(data['data']['message']['phone_number'])
@@ -163,6 +163,7 @@ def user_chat():
                     body_content = data['data']['message']['message_content']['text']
                     assistant_response = assistant.get_assistant_response(wa_id, body_content)
                     print(f"assistant_response\n {assistant_response}")
+                    
 
 
                     whatsapp_api.send_message(wa_id, assistant_response)
@@ -170,8 +171,11 @@ def user_chat():
 
                 elif message_type == 'IMAGE':
                     image_ids_list = data['data']['message']['message_content']['url']
-                    get_image(wa_id, image_ids_list)
-                    process_images(wa_id)
+                    assistant_response = assistant.get_assistant_response(wa_id, image_ids_list)
+                    print(f"assistant_image\n {image_ids_list}")
+
+                    #get_image(wa_id, image_ids_list)
+                    process_images(image_ids_list)
                     response_message = "Thanks for sharing the image; our team will contact you shortly."
                     whatsapp_api.send_message(wa_id, response_message)
                     return jsonify({"message": "Image processed"}), 200
