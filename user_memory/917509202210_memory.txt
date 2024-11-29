@@ -64,3 +64,5 @@ User: https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=comp
 Assistant: It looks like you've shared a link to an image. While I can't view images directly, I'm here to help you with selling your watch. Could you please provide me with the model of the watch you're looking to sell? Once we have that information, we can continue with the process.
 User: https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
 Assistant: It seems you've provided a link to an image. While I can't view images directly, I'm more than happy to assist you with selling your watch. Could you please let me know the model of the watch you're looking to sell? That information will help us move forward with the process.
+User: https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
+Assistant: I see you've shared a link to an image. Unfortunately, I can't view images directly. However, I'm here to help you with the process of selling your watch. Could you please provide the model of your watch? That will help us get started.

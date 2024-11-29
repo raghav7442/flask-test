@@ -145,6 +145,7 @@ def user_chat():
         return "No challenge", 400
 
     elif request.method == 'POST':
+        logging.info("POST ")
         if request.is_json:
             data = request.json
             logging.info("post method")
@@ -162,7 +163,7 @@ def user_chat():
                 if message_type == 'TEXT':
                     body_content = data['data']['message']['message_content']['text']
                     assistant_response = assistant.get_assistant_response(wa_id, body_content)
-                    print(f"assistant_response\n {assistant_response}")
+                    # print(f"assistant_response\n {assistant_response}")
                     
 
 
@@ -172,7 +173,7 @@ def user_chat():
                 elif message_type == 'IMAGE':
                     image_ids_list = data['data']['message']['message_content']['url']
                     assistant_response = assistant.get_assistant_response(wa_id, image_ids_list)
-                    print(f"assistant_image\n {image_ids_list}")
+                    # print(f"assistant_image\n {image_ids_list}")
 
                     #get_image(wa_id, image_ids_list)
                     process_images(image_ids_list)
