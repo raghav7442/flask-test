@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import requests
 import json
-from get_image import get_image  # Ensure you have this module
-from vision import process_images  # Ensure you have this module
+from get_image import get_image  
+from vision import process_images 
 
 load_dotenv()
 
@@ -177,8 +177,9 @@ def user_chat():
                     # print(f"assistant_image\n {image_ids_list}")
 
                     #get_image(wa_id, image_ids_list)
-                    process_images(image_ids_list)
-                    response_message = "Thanks for sharing the image; our team will contact you shortly."
+                    
+                    response_message = process_images(image_ids_list)
+                    # response_message = "Thanks for sharing the image; our team will contact you shortly."
                     whatsapp_api.send_message(wa_id, response_message)
                     return jsonify({"message": "Image processed"}), 200
 
