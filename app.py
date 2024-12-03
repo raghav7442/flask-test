@@ -177,9 +177,8 @@ def user_chat():
                     # print(f"assistant_image\n {image_ids_list}")
 
                     #get_image(wa_id, image_ids_list)
-                    
-                    response_message = process_images(image_ids_list)
-                    # response_message = "Thanks for sharing the image; our team will contact you shortly."
+                    process_images(image_ids_list)
+                    response_message = "Thanks for sharing the image; our team will contact you shortly."
                     whatsapp_api.send_message(wa_id, response_message)
                     return jsonify({"message": "Image processed"}), 200
 
