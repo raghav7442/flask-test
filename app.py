@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import requests
 import json
-import time
-import random
 from get_image import get_image  
 from vision import process_images 
 
@@ -165,7 +163,6 @@ def user_chat():
 
                 if message_type == 'TEXT':
                     body_content = data['data']['message']['message_content']['text']
-                    time.sleep(random.randint(35, 45))
                     assistant_response = assistant.get_assistant_response(wa_id, body_content)
                     # print(f"assistant_response\n {assistant_response}")
                     
