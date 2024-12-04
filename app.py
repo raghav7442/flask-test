@@ -140,7 +140,6 @@ def check():
 def user_chat():
     if request.method == 'GET':
         challenge = request.args.get('challenge')
-        print( challenge)
         if challenge:
             return challenge, 200
         return "No challenge", 400
@@ -151,30 +150,39 @@ def user_chat():
             try:
                 # Extract WhatsApp ID and message details
                 wa_id = str(data['data']['message']['phone_number'])
-        
-                #message_info = data['data']['message']['message_content']['text']
                 message_type = data['data']['message']['message_type']
-
-                # image=data['data']['message']['message_content']['url']
                 logging.info(f"mobile number- {wa_id}")
 
                 if message_type == 'TEXT':
+                    # Handle text messages
                     body_content = data['data']['message']['message_content']['text']
                     assistant_response = assistant.get_assistant_response(wa_id, body_content)
-                    # print(f"assistant_response\n {assistant_response}")
                     logging.info(f"user-message- {body_content}")
                     logging.info(f"Ai Reply- {assistant_response}")
                     whatsapp_api.send_message(wa_id, assistant_response)
                     return jsonify({"message": "Text processed"}), 200
 
                 elif message_type == 'IMAGE':
-                    image_ids_list = data['data']['message']['message_content']['url']
-                    assistant_response = assistant.get_assistant_response(wa_id, image_ids_list)
-                    logging.info(f"assistant_image\n {image_ids_list}")                    
-                    process_images(image_ids_list)
-                    response_message = "Thanks for sharing the image; our team will contact you shortly."
-                    whatsapp_api.send_message(wa_id, response_message)
-                    return jsonify({"message": "Image processed"}), 200
+                    # Handle image messages
+                    image_url = data['data']['message']['message_content']['url']
+                    logging.info(f"assistant_image\n {image_url}")
+
+                    # Step 1: Process the image to get watch details
+                    try:
+                        llm_response = process_images(image_url)  # Ensure process_images() returns a string
+                        watch_details = llm_response  # Response from LLM about the watch
+                        logging.info(f"LLM Response Content for: {watch_details}")
+                        
+                        # Step 2: Send watch details to the user
+                        question = f"{watch_details}\nDoes this information look correct to you?"
+                        whatsapp_api.send_message(wa_id, question)
+                        return jsonify({"message": "Image processed and confirmation sent"}), 200
+
+                    except Exception as e:
+                        # Handle errors in image processing
+                        logging.error(f"Error processing image: {e}")
+                        whatsapp_api.send_message(wa_id, "Sorry, we could not process the image. Please try again.")
+                        return jsonify({"error": "Failed to process image"}), 500
 
                 else:
                     return jsonify({"error": "Unhandled message type"}), 400
@@ -189,6 +197,7 @@ def user_chat():
 
         else:
             return jsonify({"error": "Unsupported Media Type"}), 415
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

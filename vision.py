@@ -18,33 +18,23 @@ def process_images(image_url: str):
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         logging.error("OpenAI API key is not set.")
-        return
+        return "Error: Missing API Key."
 
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}"
     }
- 
+
     # Encode the image in base64
     base64_image = image_to_base64(image_url)
-        
+
     payload = {
         "model": "gpt-4o-mini",
         "messages": [
             {
                 "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "you are a helpful assistant, you will get the images of watch, you will describe the image, also it's brand, you will find the scratches on the watch and its condition, you will return the message of the condition of the watch, that if it looks like new watch and there are no scratches and everything is fine, you will return the message that it looks fine, if the watch have scratches you will find the count of the scratches and it's quality, if the image is blur you will send user a message that, he need to upload the same image in a good quality"
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{base64_image}"
-                        }
-                    }
-                ]
+                "content": f"Describe the watch in the image. Also identify its brand, scratches, and overall condition.\n"
+                           f"Here's the image: data:image/jpeg;base64,{base64_image}"
             }
         ],
         "max_tokens": 300
@@ -52,16 +42,13 @@ def process_images(image_url: str):
 
     # Send the request to OpenAI API
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
-    
+
     if response.status_code == 200:
         response_json = response.json()
         # Extract the 'content' from the response
         content = response_json['choices'][0]['message']['content']
-        # Log the content only
-        logging.info(f"LLM Response Content for: {content}")
-        
-        
+        return content  # Return the watch details as a string
     else:
-        # Log errors
         logging.error(f"Error: {response.status_code} for image")
         logging.error(response.text)
+        return "Sorry, we could not analyze the image."
