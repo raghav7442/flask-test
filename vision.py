@@ -59,6 +59,8 @@ def process_images(image_url: str):
         content = response_json['choices'][0]['message']['content']
         # Log the content only
         logging.info(f"LLM Response Content for: {content}")
+
+        return content
         
         
     else:

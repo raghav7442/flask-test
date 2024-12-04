@@ -179,10 +179,12 @@ def user_chat():
                 elif message_type == 'IMAGE':
                     image_ids_list = data['data']['message']['message_content']['url']
                     assistant_response = assistant.get_assistant_response(wa_id, image_ids_list)
-                    logging.info(f"assistant_image\n {image_ids_list}")                    
-                    process_images(image_ids_list)
+                    logging.info(f"assistant_image\n {image_ids_list}") 
+
+                    imgResponse = process_images(image_ids_list)
                     response_message = "Thanks for sharing the image; our team will contact you shortly."
                     whatsapp_api.send_message(wa_id, response_message)
+                    whatsapp_api.send_message(wa_id, imgResponse )
                     return jsonify({"message": "Image processed"}), 200
 
                 else:
