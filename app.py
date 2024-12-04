@@ -7,6 +7,8 @@ import requests
 import json
 import time
 import random
+from get_image import get_image  
+from vision import process_images 
 
 load_dotenv()
 
@@ -27,9 +29,8 @@ class WatchSellingAssistant:
     def save_to_memory(self, wa_id, user_message, assistant_reply):
         file_path = self.get_user_memory_file(wa_id)
         with open(file_path, "a") as f:
-            if assistant_reply not in open(file_path).read():  # Avoid duplicate saving
-                f.write(f"User: {user_message}\n")
-                f.write(f"Assistant: {assistant_reply}\n")
+            f.write(f"User: {user_message}\n")
+            f.write(f"Assistant: {assistant_reply}\n")
 
     def load_from_memory(self, wa_id):
         file_path = self.get_user_memory_file(wa_id)
@@ -57,7 +58,7 @@ class WatchSellingAssistant:
              11.thank you for all the info let me share all the details according to you and get back to you. Throughout, maintain a friendly and professional tone, keeping the conversation respectful and smooth."""},
                 
             ]
-
+            
             if history:
                 for line in history.splitlines():
                     if line.startswith("User:"):
@@ -137,32 +138,50 @@ def check():
 
 @app.route('/userChat', methods=['GET', 'POST'])
 def user_chat():
-    logging.info("Received a request.")
+    logging.info("get ")
+    logging.info(request)
     if request.method == 'GET':
         challenge = request.args.get('challenge')
+        print( challenge)
         if challenge:
             return challenge, 200
         return "No challenge", 400
 
     elif request.method == 'POST':
+        logging.info("POST ")
         if request.is_json:
             data = request.json
+            logging.info("post method")
+            # logging.info(request)
             try:
+                # Extract WhatsApp ID and message details
                 wa_id = str(data['data']['message']['phone_number'])
+        
+                #message_info = data['data']['message']['message_content']['text']
                 message_type = data['data']['message']['message_type']
 
-                logging.info(f"Mobile number: {wa_id}")
+                # image=data['data']['message']['message_content']['url']
+                logging.info(f"mobile number- {wa_id}")
 
                 if message_type == 'TEXT':
                     body_content = data['data']['message']['message_content']['text']
-                    time.sleep(random.randint(35, 45))  # Add delay
+                    time.sleep(random.randint(35, 45))
                     assistant_response = assistant.get_assistant_response(wa_id, body_content)
+                    # print(f"assistant_response\n {assistant_response}")
+                    
+
+
                     whatsapp_api.send_message(wa_id, assistant_response)
                     return jsonify({"message": "Text processed"}), 200
 
                 elif message_type == 'IMAGE':
                     image_ids_list = data['data']['message']['message_content']['url']
-                    time.sleep(random.randint(35, 45))  # Add delay
+                    assistant_response = assistant.get_assistant_response(wa_id, image_ids_list)
+                    # print(f"assistant_image\n {image_ids_list}")
+
+                    #get_image(wa_id, image_ids_list)
+                    
+                    process_images(image_ids_list)
                     response_message = "Thanks for sharing the image; our team will contact you shortly."
                     whatsapp_api.send_message(wa_id, response_message)
                     return jsonify({"message": "Image processed"}), 200
@@ -183,4 +202,4 @@ def user_chat():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True,host='0.0.0.0', port=5000)
