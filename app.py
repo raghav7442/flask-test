@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import requests
 import json
-from get_image import get_image  
-from vision import process_images 
+import time
+import random
 
 load_dotenv()
 
@@ -27,8 +27,9 @@ class WatchSellingAssistant:
     def save_to_memory(self, wa_id, user_message, assistant_reply):
         file_path = self.get_user_memory_file(wa_id)
         with open(file_path, "a") as f:
-            f.write(f"User: {user_message}\n")
-            f.write(f"Assistant: {assistant_reply}\n")
+            if assistant_reply not in open(file_path).read():  # Avoid duplicate saving
+                f.write(f"User: {user_message}\n")
+                f.write(f"Assistant: {assistant_reply}\n")
 
     def load_from_memory(self, wa_id):
         file_path = self.get_user_memory_file(wa_id)
@@ -41,22 +42,18 @@ class WatchSellingAssistant:
         try:
             history = self.load_from_memory(wa_id)
             messages = [
-                {"role": "system", "content": """You are a professional and friendly assistant and your name is Amy here from AlienTime helping users sell their watches. You should guide the conversation naturally, like a human watch dealer. remember you are the selling plate form, you cannot suggest client to hike the price, if the client gives you price according to it, you will send thank you message like, thank you for all the information, let me confirm with all my team and they will get back to you..
-             Here's the flow you should follow: 
-             1. Greet the user "Hey it's Amy here from AlienTime, how do I address you? 
-             2  Hey "If the user mentions name", it's a pleasure to connect Are you looking to sell a watch?
-             3. If the user mentions selling a watch, ask for the model of the watch. 
-             4. Once the model is provided, compliment the watch and ask for the year of purchase. 
-             5. then ask if they have a price in mind
-             6. Do you have original box and bill and warranty card with you? 
-             7. do you have any ovbious marks scratches in your watch,
-             8. Are you urgent in wanting to sell it? 
-             9. If the user provides a price, thank them and let them know you'll confirm the details. 
-             10. Got it, let me confirm some details with my team, can you send a photo of the watch??
-             11.thank you for all the info let me share all the details according to you and get back to you. Throughout, maintain a friendly and professional tone, keeping the conversation respectful and smooth."""},
-                
+                {"role": "system", "content": """You are Amy from AlienTime, a professional and friendly assistant helping users sell their watches. Follow these steps for smooth interactions:
+                1. Greet the user and ask their name. 
+                2. Ask if they're looking to sell a watch.
+                3. Ask for the model, year of purchase, and price range.
+                4. Ask for details like original box, warranty card, and scratches.
+                5. Request a photo of the watch.
+                6. Send one clear reply, avoid duplicates, and confirm receipt of details.
+                7. Thank the user and inform them your team will contact them shortly. 
+                Always maintain a friendly, professional tone and avoid suggesting price changes."""
+                },
             ]
-            
+
             if history:
                 for line in history.splitlines():
                     if line.startswith("User:"):
@@ -136,48 +133,32 @@ def check():
 
 @app.route('/userChat', methods=['GET', 'POST'])
 def user_chat():
-    logging.info("get ")
-    logging.info(request)
+    logging.info("Received a request.")
     if request.method == 'GET':
         challenge = request.args.get('challenge')
-        print( challenge)
         if challenge:
             return challenge, 200
         return "No challenge", 400
 
     elif request.method == 'POST':
-        logging.info("POST ")
         if request.is_json:
             data = request.json
-            logging.info("post method")
-            # logging.info(request)
             try:
-                # Extract WhatsApp ID and message details
                 wa_id = str(data['data']['message']['phone_number'])
-        
-                #message_info = data['data']['message']['message_content']['text']
                 message_type = data['data']['message']['message_type']
 
-                # image=data['data']['message']['message_content']['url']
-                logging.info(f"mobile number- {wa_id}")
+                logging.info(f"Mobile number: {wa_id}")
 
                 if message_type == 'TEXT':
                     body_content = data['data']['message']['message_content']['text']
+                    time.sleep(random.randint(35, 45))  # Add delay
                     assistant_response = assistant.get_assistant_response(wa_id, body_content)
-                    # print(f"assistant_response\n {assistant_response}")
-                    
-
-
                     whatsapp_api.send_message(wa_id, assistant_response)
                     return jsonify({"message": "Text processed"}), 200
 
                 elif message_type == 'IMAGE':
                     image_ids_list = data['data']['message']['message_content']['url']
-                    assistant_response = assistant.get_assistant_response(wa_id, image_ids_list)
-                    # print(f"assistant_image\n {image_ids_list}")
-
-                    #get_image(wa_id, image_ids_list)
-                    process_images(image_ids_list)
+                    time.sleep(random.randint(35, 45))  # Add delay
                     response_message = "Thanks for sharing the image; our team will contact you shortly."
                     whatsapp_api.send_message(wa_id, response_message)
                     return jsonify({"message": "Image processed"}), 200
@@ -198,4 +179,4 @@ def user_chat():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    app.run(debug=True,host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

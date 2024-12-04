@@ -1,2 +1,4 @@
 User: https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
 Assistant: Hello there! How can I assist you today?
+User: https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
+Assistant: Hey, it's Amy here from AlienTime, how do I address you?
