@@ -25,30 +25,37 @@ def process_images(image_url: str):
         "Authorization": f"Bearer {api_key}"
     }
 
-    # Encode the image in base64
-    base64_image = image_to_base64(image_url)
+    try:
+        # Encode the image in base64
+        base64_image = image_to_base64(image_url)
 
-    payload = {
-        "model": "gpt-4o-mini",
-        "messages": [
-            {
-                "role": "user",
-                "content": f"Describe the watch in the image. Also identify its brand, scratches, and overall condition.\n"
-                           f"Here's the image: data:image/jpeg;base64,{base64_image}"
-            }
-        ],
-        "max_tokens": 300
-    }
+        payload = {
+            "model": "gpt-4o-mini",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": f"You are an assistant helping analyze watch images. Describe the watch, including its brand, condition, scratches, and overall details. Here's the image: data:image/jpeg;base64,{base64_image}"
+                }
+            ],
+            "max_tokens": 300
+        }
 
-    # Send the request to OpenAI API
-    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+        # Send the request to OpenAI API
+        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
 
-    if response.status_code == 200:
-        response_json = response.json()
-        # Extract the 'content' from the response
-        content = response_json['choices'][0]['message']['content']
-        return content  # Return the watch details as a string
-    else:
-        logging.error(f"Error: {response.status_code} for image")
-        logging.error(response.text)
-        return "Sorry, we could not analyze the image."
+        if response.status_code == 200:
+            response_json = response.json()
+            # Extract the 'content' from the response
+            content = response_json['choices'][0]['message']['content'].strip()
+            if not content or "unable to" in content.lower():
+                # If the response is not meaningful, fallback to error message
+                return "Sorry, I couldn't analyze the image. Please upload a clearer image or provide more details."
+            return content  # Return the watch details as a string
+        else:
+            logging.error(f"Error: {response.status_code} for image")
+            logging.error(response.text)
+            return "Sorry, I couldn't analyze the image. Please upload a clearer image or provide more details."
+
+    except Exception as e:
+        logging.error(f"Exception occurred while processing image: {e}")
+        return "Sorry, I couldn't process the image. Please try again."

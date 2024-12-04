@@ -165,18 +165,19 @@ def user_chat():
                 elif message_type == 'IMAGE':
                     # Handle image messages
                     image_url = data['data']['message']['message_content']['url']
-                    logging.info(f"assistant_image\n {image_url}")
+                    logging.info(f"Received image: {image_url}")
 
-                    # Step 1: Process the image to get watch details
                     try:
+                        # Step 1: Process the image to get watch details
                         llm_response = process_images(image_url)  # Ensure process_images() returns a string
-                        watch_details = llm_response  # Response from LLM about the watch
-                        logging.info(f"LLM Response Content for: {watch_details}")
-                        
-                        # Step 2: Send watch details to the user
-                        question = f"{watch_details}\nDoes this information look correct to you?"
-                        whatsapp_api.send_message(wa_id, question)
-                        return jsonify({"message": "Image processed and confirmation sent"}), 200
+                        if "Sorry" in llm_response:  # Check for fallback response
+                            response_message = llm_response
+                        else:
+                            # Step 2: Send the detailed response to the user
+                            response_message = f"{llm_response}\nDoes this information look correct to you?"
+
+                        whatsapp_api.send_message(wa_id, response_message)
+                        return jsonify({"message": "Image processed and response sent"}), 200
 
                     except Exception as e:
                         # Handle errors in image processing
