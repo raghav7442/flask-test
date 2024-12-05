@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import requests
 import json
-from get_image import get_image  
-from vision import process_images 
-from datetime import datetime
-import logging
+from get_image import get_image
+from vision import process_images
+from datetime import datetime, timedelta
+import threading
 
 load_dotenv()
 
@@ -129,6 +129,33 @@ class WhatsAppAPI:
         else:
             logging.error(f"Failed to send message to {to}")
 
+# Temporary buffer for batching user messages
+user_message_buffer = {}
+
+def process_messages(wa_id):
+    """Process and send accumulated messages after 30 seconds."""
+    global user_message_buffer
+    if wa_id in user_message_buffer:
+        messages = user_message_buffer[wa_id]['messages']
+        combined_message = " ".join(messages)
+        assistant_response = assistant.get_assistant_response(wa_id, combined_message)
+        whatsapp_api.send_message(wa_id, assistant_response)
+
+        # Clear the buffer for this user
+        del user_message_buffer[wa_id]
+
+def add_message_to_buffer(wa_id, body_content):
+    """Add a message to the buffer and schedule processing."""
+    global user_message_buffer
+    if wa_id in user_message_buffer:
+        user_message_buffer[wa_id]['messages'].append(body_content)
+    else:
+        user_message_buffer[wa_id] = {
+            'messages': [body_content],
+        }
+        threading.Timer(30, process_messages, args=(wa_id,)).start()
+
+# Flask App Setup
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 assistant = WatchSellingAssistant()
@@ -162,17 +189,7 @@ def user_chat():
 
                 if message_type == 'TEXT':
                     body_content = data['data']['message']['message_content']['text']
-                    start_time = datetime.now()  # Capture the start time
-                    assistant_response = assistant.get_assistant_response(wa_id, body_content)
-                    end_time = datetime.now()  # Capture the end time
-                    response_time = (end_time - start_time).total_seconds()  # Calculate the response time in seconds
-
-                    # Log the details
-                    logging.info(f"user-message- {body_content}")
-                    logging.info(f"Ai Reply- {assistant_response}")
-                    logging.info(f"Response Time- {response_time} seconds at {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
-
-                    whatsapp_api.send_message(wa_id, assistant_response)
+                    add_message_to_buffer(wa_id, body_content)
                     return jsonify({"message": "Text processed"}), 200
                 
 
@@ -180,11 +197,12 @@ def user_chat():
                     image_ids_list = data['data']['message']['message_content']['url']
                     assistant_response = assistant.get_assistant_response(wa_id, image_ids_list)
                     logging.info(f"assistant_image\n {image_ids_list}") 
+                    logging.info(f"assistant_reply\n {assistant_response}") 
 
                     imgResponse = process_images(image_ids_list)
                     response_message = "Thanks for sharing the image; our team will contact you shortly."
                     whatsapp_api.send_message(wa_id, response_message)
-                    whatsapp_api.send_message(wa_id, imgResponse )
+                    whatsapp_api.send_message(wa_id, imgResponse)
                     return jsonify({"message": "Image processed"}), 200
 
                 else:
@@ -203,4 +221,4 @@ def user_chat():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    app.run(debug=True,host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
