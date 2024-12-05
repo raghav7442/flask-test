@@ -2,4 +2,4 @@ openai
 python-dotenv
 flask
 requests==2.32.3
-threading
+threading == 4.2.0
