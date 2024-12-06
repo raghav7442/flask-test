@@ -36,7 +36,7 @@ def process_images(image_url: str):
                 "content": [
                     {
                         "type": "text",
-                        "text": "you are a helpful assistant, you will get the images of watch, you will describe the image, also it's brand, you will find the scratches on the watch and its condition, you will return the message of the condition of the watch, that if it looks like new watch and there are no scratches and everything is fine, you will return the message that it looks fine, if the watch have scratches you will find the count of the scratches and it's quality, if the image is blur you will send user a message that, he need to upload the same image in a good quality"
+                        "text": "you are a helpful assistant, you will get the images of watch, you will describe the image, also it's brand, you will find the scratches on the watch and its condition, you will return the message of the condition of the watch, that if it looks like new watch and there are no scratches and everything is fine, you will return the message that it looks fine, if the watch have scratches you will find the count of the scratches and it's quality, if the image is blur you will send user a message that, he need to upload the same image in a good quality if the image is not related to watch you have to ask user to send a actual watch image and it is actual watch image say Thanks for sharing our Team will Contact you shortly. when it is actual watch image, broken or in good condition if it not wtach image ask to share actual watch image"
                     },
                     {
                         "type": "image_url",

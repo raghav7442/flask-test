@@ -130,30 +130,47 @@ class WhatsAppAPI:
             logging.error(f"Failed to send message to {to}")
 
 # Temporary buffer for batching user messages
-user_message_buffer = {}
+# Global buffer for batching user messages
+user_message_buffer = {}  # Structure: {wa_id: {"messages": [], "timer": Timer}}
 
 def process_messages(wa_id):
-    """Process and send accumulated messages after 30 seconds."""
+    """Process and send accumulated messages after the delay."""
     global user_message_buffer
+
     if wa_id in user_message_buffer:
-        messages = user_message_buffer[wa_id]['messages']
-        combined_message = " ".join(messages)
-        assistant_response = assistant.get_assistant_response(wa_id, combined_message)
-        whatsapp_api.send_message(wa_id, assistant_response)
+        # Combine all messages in the buffer
+        messages = user_message_buffer[wa_id]["messages"]
+        combined_message = " ".join(messages).strip()
 
         # Clear the buffer for this user
         del user_message_buffer[wa_id]
 
+        if combined_message:
+            # Generate AI assistant response
+            assistant_response = assistant.get_assistant_response(wa_id, combined_message)
+
+            # Send the response via WhatsApp
+            whatsapp_api.send_message(wa_id, assistant_response)
+
 def add_message_to_buffer(wa_id, body_content):
     """Add a message to the buffer and schedule processing."""
     global user_message_buffer
-    if wa_id in user_message_buffer:
-        user_message_buffer[wa_id]['messages'].append(body_content)
-    else:
-        user_message_buffer[wa_id] = {
-            'messages': [body_content],
-        }
-        threading.Timer(30, process_messages, args=(wa_id,)).start()
+
+    if wa_id not in user_message_buffer:
+        # Initialize a new buffer entry for this user
+        user_message_buffer[wa_id] = {"messages": [], "timer": None}
+
+    # Append the new message to the user's message queue
+    user_message_buffer[wa_id]["messages"].append(body_content)
+
+    # Reset the timer (if one exists) or start a new one
+    if user_message_buffer[wa_id]["timer"]:
+        user_message_buffer[wa_id]["timer"].cancel()  # Cancel the existing timer
+
+    # Start a new timer for delayed processing
+    user_message_buffer[wa_id]["timer"] = threading.Timer(30, process_messages, args=(wa_id,))
+    user_message_buffer[wa_id]["timer"].start()
+
 
 # Flask App Setup
 app = Flask(__name__)
@@ -200,9 +217,9 @@ def user_chat():
                     logging.info(f"assistant_reply\n {assistant_response}") 
 
                     imgResponse = process_images(image_ids_list)
-                    response_message = "Thanks for sharing the image; our team will contact you shortly."
-                    whatsapp_api.send_message(wa_id, response_message)
-                    whatsapp_api.send_message(wa_id, imgResponse)
+                    # response_message = "Thanks for sharing the image; our team will contact you shortly."
+                    # whatsapp_api.send_message(wa_id, response_message)
+                    # whatsapp_api.send_message(wa_id, imgResponse)
                     return jsonify({"message": "Image processed"}), 200
 
                 else:

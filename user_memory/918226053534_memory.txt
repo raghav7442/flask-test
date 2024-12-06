@@ -2,3 +2,47 @@ User: https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=comp
 Assistant: Hello there! How can I assist you today?
 User: https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
 Assistant: Hey, it's Amy here from AlienTime, how do I address you?
+User: https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
+Assistant: Hey there! I see you've shared a photo. How do I address you?
+User: HEllo
+Assistant: Hey, it's Amy here from AlienTime, how do I address you?
+User: https://t3.ftcdn.net/jpg/05/59/86/60/240_F_559866040_FJ277PR0SpXET9vBgIlJKM84zaZXkvav.jpg
+Assistant: Hey there! I noticed you shared a photo. How do I address you?
+User: https://img.drz.lazcdn.com/static/pk/p/9de3b4bb12e7924c1dab35b3a38bafe6.jpg_720x720q80.jpg
+Assistant: Hey there! I see you've shared another photo. How do I address you?
+User: HEllo
+Assistant: Hey, it's Amy here from AlienTime, how do I address you?
+User: yes it is right information
+Assistant: Great! Are you looking to sell a watch today?
+User: https://img.drz.lazcdn.com/static/pk/p/9de3b4bb12e7924c1dab35b3a38bafe6.jpg_720x720q80.jpg
+Assistant: Thank you for sharing the photo! Could you please let me know the model of the watch you're looking to sell?
+User: Hey
+Assistant: Hey! It's Amy here from AlienTime. How do I address you?
+User: nandini
+Assistant: Hey Nandini, it's a pleasure to connect! Are you looking to sell a watch?
+User: https://as2.ftcdn.net/v2/jpg/02/56/25/31/1000_F_256253167_D2xdVRL81YuHi5zB4b8FiTqTqKORPQNS.jpg
+Assistant: Thank you for sharing the photo, Nandini! Could you please let me know the model of the watch you're looking to sell?
+User: https://as2.ftcdn.net/v2/jpg/02/56/25/31/1000_F_256253167_D2xdVRL81YuHi5zB4b8FiTqTqKORPQNS.jpg
+Assistant: Thanks for sharing the photo, Nandini! Could you tell me the model of the watch that you're looking to sell?
+User: what i have to do
+Assistant: If you're looking to sell a watch, could you please provide the model of the watch? That will help us get started!
+User: https://img.drz.lazcdn.com/static/pk/p/9de3b4bb12e7924c1dab35b3a38bafe6.jpg_720x720q80.jpg
+Assistant: Thanks for sharing another photo, Nandini! Could you please let me know the model of the watch you're looking to sell?
+User: https://img.drz.lazcdn.com/static/pk/p/9de3b4bb12e7924c1dab35b3a38bafe6.jpg_720x720q80.jpg
+Assistant: Thank you for the photo, Nandini! Could you please provide the model name or number of the watch you're looking to sell?
+User: https://5.imimg.com/data5/ANDROID/Default/2021/7/WF/LR/TH/96518014/img-20210701-wa0048-jpg-500x500.jpg
+Assistant: Thanks for the photo, Nandini! Could you please let me know the model of the watch you're interested in selling?
+User: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvAG--Tq4MDlaWyIOAmOR1QYnMBS9DZoudnS7L7H2Ohx4MVWGDCr6N4z1hLs_P6KbONdk&usqp=CAU
+Assistant: Thank you for sharing, Nandini! Could you please tell me the model of the watch you're looking to sell?
+User: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvAG--Tq4MDlaWyIOAmOR1QYnMBS9DZoudnS7L7H2Ohx4MVWGDCr6N4z1hLs_P6KbONdk&usqp=CAU
+Assistant: Thanks for sharing the image, Nandini! Could you let me know the model of the watch you're interested in selling?
+User: https://www.watchuseek.com/attachments/citizenwatch-jpg.17464321/
+Assistant: Thank you for the image, Nandini! Could you please share the model name or number of the Citizen watch you're looking to sell?
+User: https://www.watchuseek.com/attachments/citizenwatch-jpg.17464321/
+Assistant: Thanks for sharing the image again, Nandini! Could you let me know the model name or number of the Citizen watch you're planning to sell?
+User: https://www.watchuseek.com/attachments/download-1-01-jpeg.17472571/
+Assistant: Thank you for the image, Nandini! Could you please provide the model name or number of the watch you're interested in selling?
+User: https://img.tatacliq.com/images/i20//658Wx734H/MP000000024136436_658Wx734H_202410231153551.jpeg
+Assistant: Thank you for sharing the image, Nandini! Could you let me know the model of the watch you're looking to sell?
+User: hello whiw hwwsdde
+Assistant: Hey there, Nandini! It seems like there might have been a little mix-up in your message. Could you please let me know the model of the watch you're looking to sell?
