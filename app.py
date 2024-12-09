@@ -9,41 +9,61 @@ from get_image import get_image
 from vision import process_images
 from datetime import datetime, timedelta
 import threading
-
+from pymongo import MongoClient
 load_dotenv()
+class MongoDB:
+    def __init__(self):
+        mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+        self.client = MongoClient(mongo_uri)
+        self.db = self.client["chat_database"]
+        self.collection = self.db["chat_history"]
+
+    def save_chat(self, wa_id, user_message, assistant_reply, message_type):
+        chat_entry = {
+            "user_message": user_message,
+            "assistant_reply": assistant_reply,
+            "type": message_type,
+            "timestamp": datetime.utcnow(),
+        }
+
+        existing_chat = self.collection.find_one({"wa_id": wa_id})
+        if existing_chat:
+            self.collection.update_one(
+                {"wa_id": wa_id},
+                {"$push": {"chat_history": chat_entry}}
+            )
+        else:
+            new_chat = {
+                "wa_id": wa_id,
+                "chat_history": [chat_entry],
+                "created_at": datetime.utcnow()
+            }
+            self.collection.insert_one(new_chat)
+
+    def load_chat(self, wa_id, limit=10):
+        """
+        Load the most recent chat history for a user.
+        :param wa_id: WhatsApp ID of the user
+        :param limit: Number of most recent messages to retrieve
+        :return: A list of chat entries, or an empty list if no chat found
+        """
+        chat = self.collection.find_one({"wa_id": wa_id})
+        if chat:
+            return chat["chat_history"][-limit:]  # Return the last `limit` messages
+        return []
+
 
 class WatchSellingAssistant:
     def __init__(self):
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.client = OpenAI(api_key=self.api_key)
-        self.memory_dir = "user_memory"
-        self.initialize_memory_dir()
-
-    def initialize_memory_dir(self):
-        if not os.path.exists(self.memory_dir):
-            os.makedirs(self.memory_dir)
-
-    def get_user_memory_file(self, wa_id):
-        return os.path.join(self.memory_dir, f"{wa_id}_memory.txt")
-
-    def save_to_memory(self, wa_id, user_message, assistant_reply):
-        file_path = self.get_user_memory_file(wa_id)
-        with open(file_path, "a") as f:
-            f.write(f"User: {user_message}\n")
-            f.write(f"Assistant: {assistant_reply}\n")
-
-    def load_from_memory(self, wa_id):
-        file_path = self.get_user_memory_file(wa_id)
-        if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                return f.read()
-        return ""
+        self.db = MongoDB()
 
     def get_assistant_response(self, wa_id, prompt):
         try:
-            history = self.load_from_memory(wa_id)
-            messages = [
-                {"role": "system", "content": """You are a professional and friendly assistant and your name is Amy here from AlienTime helping users sell their watches. You should guide the conversation naturally, like a human watch dealer. remember you are the selling plate form, you cannot suggest client to hike the price, if the client gives you price according to it, you will send thank you message like, thank you for all the information, let me confirm with all my team and they will get back to you..
+            # Load past chat history for context
+            chat_history = self.db.load_chat(wa_id, limit=10)
+            prompt= """You are a professional and friendly assistant and your name is Amy here from AlienTime helping users sell their watches. You should guide the conversation naturally, like a human watch dealer. remember you are the selling plate form, you cannot suggest client to hike the price, if the client gives you price according to it, you will send thank you message like, thank you for all the information, let me confirm with all my team and they will get back to you..
              Here's the flow you should follow: 
              1. Greet the user "Hey it's Amy here from AlienTime, how do I address you? 
              2  Hey "If the user mentions name", it's a pleasure to connect Are you looking to sell a watch?
@@ -57,33 +77,51 @@ class WatchSellingAssistant:
              10. Got it, let me confirm some details with my team, can you send a photo of the watch??
              11. if the user send photos or information in starting of the conversation you have the check which information is missing and ask for the same once all things are confirmed.
              12.thank you for all the info let me share all the details according to you and get back to you. Throughout, maintain a friendly and professional tone, keeping the conversation respectful and smooth.
-             """},
-                
-            ]
-            
-            if history:
-                for line in history.splitlines():
-                    if line.startswith("User:"):
-                        messages.append({"role": "user", "content": line[6:]})
-                    elif line.startswith("Assistant:"):
-                        messages.append({"role": "assistant", "content": line[11:]})
+             """
+            messages = [{"role": "system", "content": """You are a professional and friendly assistant named Amy...""" }]
 
+            # Add chat history to context
+            for entry in chat_history:
+                messages.append({"role": "user", "content": entry["user_message"]})
+                messages.append({"role": "assistant", "content": entry["assistant_reply"]})
+
+            # Add the current prompt
             messages.append({"role": "user", "content": prompt})
 
+            # Generate response
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=messages,
                 max_tokens=150,
-                n=1,
-                stop=None,
                 temperature=0.7,
             )
             assistant_reply = response.choices[0].message.content.strip()
-            self.save_to_memory(wa_id, prompt, assistant_reply)
             return assistant_reply
         except Exception as e:
             logging.error(f"OpenAI API request failed: {e}")
             return "I'm sorry, but I couldn't process your request at the moment."
+
+    def reply_and_save(self, wa_id, user_message, message_type):
+        """
+        Generate reply and save chat history to MongoDB.
+        :param wa_id: WhatsApp ID of the user
+        :param user_message: User's message
+        :param message_type: Message type ('TEXT' or 'IMAGE')
+        :return: Assistant's reply
+        """
+        if message_type == 'TEXT':
+            assistant_reply = self.get_assistant_response(wa_id, user_message)
+        elif message_type == 'IMAGE':
+            assistant_reply = "It seems you have sent an image. Our team will review it shortly."
+        else:
+            assistant_reply = "Unhandled message type."
+
+        # Save conversation to MongoDB
+        self.db.save_chat(wa_id, user_message, assistant_reply, message_type)
+
+        return assistant_reply
+
+
 
 class AiSensyAPI:
     def __init__(self):
@@ -207,6 +245,7 @@ def user_chat():
                 if message_type == 'TEXT':
                     body_content = data['data']['message']['message_content']['text']
                     add_message_to_buffer(wa_id, body_content)
+                
                     return jsonify({"message": "Text processed"}), 200
                 
 
