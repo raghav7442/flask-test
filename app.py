@@ -31,7 +31,8 @@ def process_messages(wa_id):
             assistant_response = assistant.get_assistant_response(wa_id, combined_message)
             mongodb.save_chat(wa_id,combined_message,assistant_response,"TEXT")
             # Send the response via WhatsApp
-            whatsapp_api.send_message(wa_id, assistant_response)
+            # whatsapp_api.send_message(wa_id, assistant_response)
+            logging.info(assistant_response)
 
 
 def add_message_to_buffer(wa_id, body_content):
@@ -101,7 +102,7 @@ def user_chat():
                     imgResponse = process_images(image_ids_list,chat)
 
                     logging.info(f"image response{imgResponse}")
-                    whatsapp_api.send_message(wa_id, imgResponse)
+                    # whatsapp_api.send_message(wa_id, imgResponse)
                     mongodb.save_chat(wa_id,image_ids_list,imgResponse,"IMAGE")
                     
                     return jsonify({"message": "Image processed"}), 200

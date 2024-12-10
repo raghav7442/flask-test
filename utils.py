@@ -36,7 +36,7 @@ class MongoDB:
         except Exception as e:
             logging.error(f"Error saving chat to MongoDB: {e}")
 
-    def load_chat(self, wa_id, limit=15):
+    def load_chat(self, wa_id):
         """
         Load the most recent chat history for a user.
         :param wa_id: WhatsApp ID of the user
@@ -46,7 +46,7 @@ class MongoDB:
         chat = self.collection.find_one({"wa_id": wa_id})
         if chat:
             # logging.info(chat)
-            return chat["chats"][-limit:]
+            return chat["chats"][:]
           # Return the last `limit` messages
         return []
 
@@ -57,10 +57,10 @@ class WatchSellingAssistant:
         self.openai_client = OpenAI(api_key=self.api_key)
         self.db = MongoDB()
 
-    def get_assistant_response(self, wa_id, prompt):
+    def get_assistant_response(self, wa_id, user_query):
         try:
             # Load past chat history for context
-            chat_history = self.db.load_chat(wa_id, limit=10)
+            chat_history = self.db.load_chat(wa_id)
             prompt= f"""
             here is the context or privisos chat of user, { chat_history}
             You are a professional and friendly assistant and your name is Amy here from AlienTime helping users sell their watches. You should guide the conversation naturally, like a human watch dealer. remember you are the selling plate form, you cannot suggest client to hike the price, if the client gives you price according to it, you will send thank you message like, thank you for all the information, let me confirm with all my team and they will get back to you..
@@ -87,16 +87,10 @@ class WatchSellingAssistant:
 
 
              """
-            messages = [{"role": "system", "content": prompt }]
-
-            # Add chat history to context
-            for entry in chat_history:
-                messages.append({"role": "user", "content": entry["user_message"]})
-                messages.append({"role": "assistant", "content": entry["assistant_reply"]})
-
-            # Add the current prompt
-            messages.append({"role": "user", "content": prompt})
-
+            messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": user_query}
+        ]
             # Generate response
             response = self.openai_client.chat.completions.create(
                 model="gpt-4o",
