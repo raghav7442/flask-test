@@ -50,7 +50,7 @@ def add_message_to_buffer(wa_id, body_content):
         user_message_buffer[wa_id]["timer"].cancel()  # Cancel the existing timer
 
     # Start a new timer for delayed processing
-    user_message_buffer[wa_id]["timer"] = threading.Timer(5, process_messages, args=(wa_id,))
+    user_message_buffer[wa_id]["timer"] = threading.Timer(30, process_messages, args=(wa_id,))
     user_message_buffer[wa_id]["timer"].start()
 
 
