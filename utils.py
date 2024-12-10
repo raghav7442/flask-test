@@ -87,7 +87,7 @@ class WatchSellingAssistant:
 
 
              """
-            messages = [{"role": "system", "content": """You are a professional and friendly assistant named Amy...""" }]
+            messages = [{"role": "system", "content": prompt }]
 
             # Add chat history to context
             for entry in chat_history:
