@@ -81,7 +81,7 @@ def add_message_to_buffer(wa_id, body_content):
         user_message_buffer[wa_id]["timer"].cancel()  # Cancel the existing timer
 
     # Start a new timer for delayed processing
-    user_message_buffer[wa_id]["timer"] = threading.Timer(20, process_messages, args=(wa_id,))
+    user_message_buffer[wa_id]["timer"] = threading.Timer(45, process_messages, args=(wa_id,))
     user_message_buffer[wa_id]["timer"].start()
 
 def add_image_to_buffer(wa_id, image_url):
@@ -100,7 +100,7 @@ def add_image_to_buffer(wa_id, image_url):
         user_message_buffer[wa_id]["timer"].cancel()  # Cancel the existing timer
 
     # Start a new timer for delayed processing
-    user_message_buffer[wa_id]["timer"] = threading.Timer(20, process_messages, args=(wa_id,))
+    user_message_buffer[wa_id]["timer"] = threading.Timer(45, process_messages, args=(wa_id,))
     user_message_buffer[wa_id]["timer"].start()
 
 # Flask App Setup
