@@ -106,14 +106,21 @@ class WatchSellingAssistant:
 
     def summary_of_imgresponse(self, img_response):
         prompt=f"""
-            you are an assistant for creating summary of the reposne given by assistnat, what i have done i have given multiple images to vision, in return vision is giving us response each response, for particular image, like when i have given 3 images to visin it is returning 3 diffrenet type of messages which including the imge details, and respone,
+     When you receive multiple responses from Vision regarding watches in the images, your task is to summarize them into one cohesive and detailed message. Follow these steps to structure the combined response:
 
-            what you have to do
-            you havt to combine the vision reponse to one single message which have all the response related to vision reply, 
+        Steps to Create the Response
+        Identify Similar Watches:
+        If the watches in the images belong to the same brand or are the same model, consolidate the descriptions and highlight their common features.
 
-            vision always returns results related to watch, if there are different watches are there, so it means you have to return message to user, like you have to provide the same brand's image, if there are two differnt brands are there,
+        Distinguish Different Watches:
+        If the watches belong to different brands or models, specify and differentiate them clearly in your message while ensuring the structure is easy to read.
 
-            you will receive the image reponse like this
+        Ask for Missing Details:
+        Include a request for additional details such as the year of purchase, price expectation, or original accessories. Rotate the questions to avoid repetition if multiple messages are involved.
+
+        Ensure Clarity:
+        Keep the message professional, well-structured, and grammatically accurate.
+        for example if you receive messages like this,
 
                 The image appears to show a watch from IWC Schaffhausen. It seems to be in excellent condition with no visible scratches.
 
@@ -122,7 +129,7 @@ class WatchSellingAssistant:
 
                 To proceed, could you please provide the following missing details?
 
-                1. Watch model (if different)
+                1. Watch model 
                 2. Purchase year
                 3. Urgency to sell
                 4. Price expectation
@@ -142,10 +149,11 @@ class WatchSellingAssistant:
 
             
 
-            WHAT YOU HAVE TO REPLY: WHEN RECEIVING THIS TYPE OF MESSAGE
+            you have to recreate the message like this
             the both images are same, the watch watch from IWC Schaffhausen with a green dial and chronograph function. both appears to be in excellent condition with no visible scratches.
-            to proceed further, you have to give us some detils, 
-            can you share year of purchase of your watch?
+            to proceed further, you have to give us some detils, (in with in those 5 messages you have to ask one to user)
+            i.e. can you share year of purchase of your watch?
+
 """
         messages=[
             {"role": "system", "content": prompt},
