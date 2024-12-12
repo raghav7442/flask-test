@@ -106,6 +106,10 @@ class WatchSellingAssistant:
 
     def summary_of_imgresponse(self, img_response):
         prompt=f"""
+        Act and behave like a watch selling and answer generating agent, you will receive a single message which has multiple different messages, you have to give client a precise summary of his watch status given in the messages you receive, and ask a single question with the client, in the set of questions, you will receive some 4-5 question along with the messages, in those messages you have to form a best message, like
+
+        first describe the watch condition in the recived message,
+        after that, if the qestions are availabe, ask one questions in those messages
      When you receive multiple responses from Vision regarding watches in the images, your task is to summarize them into one cohesive and detailed message. Follow these steps to structure the combined response:
 
         Steps to Create the Response
