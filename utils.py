@@ -12,7 +12,7 @@ class MongoDB:
     def __init__(self):
         mongo_uri = os.getenv("MONGO_URI")
         self.client = MongoClient(mongo_uri)
-        self.db = self.client["asisensy"]
+        self.db = self.client["sellmywatch"]
         self.collection = self.db["chat_history"]
 
     def save_chat(self, wa_id, user_message, assistant_reply, message_type):
@@ -104,6 +104,62 @@ class WatchSellingAssistant:
             logging.error(f"OpenAI API request failed: {e}")
             return "I'm sorry, but I couldn't process your request at the moment."
 
+    def summary_of_imgresponse(self, img_response):
+        prompt=f"""
+            you are an assistant for creating summary of the reposne given by assistnat, what i have done i have given multiple images to vision, in return vision is giving us response each response, for particular image, like when i have given 3 images to visin it is returning 3 diffrenet type of messages which including the imge details, and respone,
+
+            what you have to do
+            you havt to combine the vision reponse to one single message which have all the response related to vision reply, 
+
+            vision always returns results related to watch, if there are different watches are there, so it means you have to return message to user, like you have to provide the same brand's image, if there are two differnt brands are there,
+
+            you will receive the image reponse like this
+
+                The image appears to show a watch from IWC Schaffhausen. It seems to be in excellent condition with no visible scratches.
+
+                To proceed, could you please provide the following missing details?
+                The image appears to show a watch from IWC Schaffhausen. It seems to be in excellent condition with no visible scratches.
+
+                To proceed, could you please provide the following missing details?
+
+                1. Watch model (if different)
+                2. Purchase year
+                3. Urgency to sell
+                4. Price expectation
+                5. Original box, bill, and warranty card details
+
+                Thank you! The image shows a watch from IWC Schaffhausen with a green dial and chronograph function. It appears to be in excellent condition with no visible scratches.
+
+                To proceed, could you please provide the following details?
+
+                1. Your name
+                2. Purchase year
+                3. Urgency to sell
+                4. Price expectation
+                5. Original box, bill, and warranty card details
+
+                 Thank you!
+
+            
+
+            WHAT YOU HAVE TO REPLY: WHEN RECEIVING THIS TYPE OF MESSAGE
+            the both images are same, the watch watch from IWC Schaffhausen with a green dial and chronograph function. both appears to be in excellent condition with no visible scratches.
+            to proceed further, you have to give us some detils, 
+            can you share year of purchase of your watch?
+"""
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": img_response}
+        ]
+            # Generate response
+        response = self.openai_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            max_tokens=100,
+            temperature=0.5,
+        )
+        assistant_reply = response.choices[0].message.content.strip()
+        return assistant_reply
 
 
 
