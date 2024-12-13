@@ -104,8 +104,11 @@ class WatchSellingAssistant:
             logging.error(f"OpenAI API request failed: {e}")
             return "I'm sorry, but I couldn't process your request at the moment."
 
-    def summary_of_imgresponse(self, img_response):
+    def summary_of_imgresponse(self, img_response, chats):
         prompt=f"""
+        here is privious conversation to client{chats}
+        here is current date{datetime.utcnow()}
+        if you find the recent conversation where we are asking him about his name, watch model, purchase date, expected price, the watch image etc. you will not return any question to client, at all, else you cannot find any related message what i mentioned above, you will ask only one question to client after giving him all his details about the watch, you have to describe the watch first than you will ask one question to user if not there only
         Act and behave like a watch selling and answer generating agent, you will receive a single message which has multiple different messages, you have to give client a precise summary of his watch status given in the messages you receive, and ask a single question with the client, in the set of questions, you will receive some 4-5 question along with the messages, in those messages you have to form a best message, like
 
         first describe the watch condition with brand name if recived in the recived message,
@@ -154,6 +157,8 @@ class WatchSellingAssistant:
             
 
             you have to recreate the message like this
+
+            here are two messages are ther, so we return the message like this,
             the both images are same, the watch watch from IWC Schaffhausen with a green dial and chronograph function. both appears to be in excellent condition with no visible scratches.
             to proceed further, you have to give us some detils, (in with in those 5 messages you have to ask one to user)
             i.e. can you share year of purchase of your watch?

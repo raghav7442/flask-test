@@ -11,15 +11,13 @@ import threading
 from pymongo import MongoClient
 from utils import *
 load_dotenv()
-
+mongodb = MongoDB()
 # Buffer structure
 user_message_buffer = {}  # Structure: {wa_id: {"messages": [], "images": [], "timer": Timer}}
 
 def process_messages(wa_id):
     """Process and send accumulated messages and images after the delay."""
     global user_message_buffer
-    mongodb = MongoDB()
-
     if wa_id in user_message_buffer:
         # Combine all messages in the buffer
         messages = user_message_buffer[wa_id]["messages"]
@@ -54,12 +52,12 @@ def process_messages(wa_id):
             whatsapp_api.send_message(wa_id, assistant_response)
             logging.info(assistant_response)
 
-def summarize_image_responses(img_responses):
+def summarize_image_responses(img_responses, wa_id):
     """Summarize individual image responses into one cohesive response."""
     unique_responses = set(img_responses)  # Remove duplicates
-    this=" ".join(unique_responses)
     assistant=WatchSellingAssistant()
-    unique_summary=assistant.summary_of_imgresponse(this)
+    chats=mongodb.load_chat(wa_id)
+    unique_summary=assistant.summary_of_imgresponse(unique_responses, chats)
     return unique_summary
 
 
