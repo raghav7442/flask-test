@@ -55,9 +55,10 @@ def process_messages(wa_id):
 def summarize_image_responses(img_responses, wa_id):
     """Summarize individual image responses into one cohesive response."""
     unique_responses = set(img_responses)  # Remove duplicates
+    this=" ".join(unique_responses)
     assistant=WatchSellingAssistant()
     chats=mongodb.load_chat(wa_id)
-    unique_summary=assistant.summary_of_imgresponse(unique_responses, chats)
+    unique_summary=assistant.summary_of_imgresponse(this, chats)
     return unique_summary
 
 
