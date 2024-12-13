@@ -43,7 +43,7 @@ def process_messages(wa_id):
                     process_images([image.strip()], chat_history) for image in images
                 ]
                 # Create a summarized response for all images
-                img_summary = summarize_image_responses(img_responses)
+                img_summary = summarize_image_responses(img_responses, wa_id)
                 assistant_response += f"\n{img_summary}"
                 mongodb.save_chat(wa_id, images, img_summary, "IMAGE")
                 logging.info(f"Processing images: {images}")
