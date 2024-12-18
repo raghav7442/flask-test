@@ -49,7 +49,7 @@ def process_images(image_urls: list, chat_history: any):
                         **Image Analysis Rules:**
                         - If an image is provided:
                         1. Determine if the image shows a watch.
-                        2. Describe the watch, including its brand, condition, and any scratches or damage (with the count and severity if applicable).-If the watch appears in good condition with no scratches, respond e.g : The watch "model of the watch is have" appears to be in good with no visible scratches. Thanks for sharing. Our team will contact you shortly
+                        2. Describe the watch, including its brand, condition, and any scratches or damage (with the count and severity if applicable).-If the watch appears in good condition respond e.g : The watch "model of the watch is have" appears to be in good with no visible scratches. Thanks for sharing. Our team will contact you shortly
                         3. If scratches or damage are visible, respond with details, e.g., The watch has [X] visible scratches [or damage]. our team will see all things and will give you update Thanks.
                         4. If the image is blurry, request a clearer image e.g The image seems blurry. Could you please upload a clearer picture of the watch?"
                         -If the image except watch respond e.g :"Err, could you send photos regarding the watch?"
