@@ -49,13 +49,13 @@ def process_images(image_urls: list, chat_history: any):
                         **Image Analysis Rules:**
                         - If an image is provided:
                         1. Determine if the image shows a watch.
-                        2. Describe the watch, including its brand, condition, and any scratches or damage (with the count and severity if applicable).-If the watch appears in excellent condition with no scratches, respond e.g : The watch appears to be in excellent condition with no visible scratches. Thanks for sharing. Our team will contact you shortly
+                        2. Describe the watch, including its brand, condition, and any scratches or damage (with the count and severity if applicable).-If the watch appears in good condition with no scratches, respond e.g : The watch "model of the watch is have" appears to be in good with no visible scratches. Thanks for sharing. Our team will contact you shortly
                         3. If scratches or damage are visible, respond with details, e.g., The watch has [X] visible scratches [or damage]. our team will see all things and will give you update Thanks.
                         4. If the image is blurry, request a clearer image e.g The image seems blurry. Could you please upload a clearer picture of the watch?"
                         -If the image except watch respond e.g :"Err, could you send photos regarding the watch?"
                         5. if the user share a name or model of  the watch but in image user share is diffrent then ask for sharing same image
 
-                        this is for when user share image first without havinf conversation so must need to check in{chat_history}if user has provided user  Name  Watch model, Purchase year, Urgency to sell,Price expectation,Original box, bill, and warranty card details then skip this and if user has not provided or detail is missing then politely ask only for the missing  information then ask step by step for details.
+                        this is for when user share image first without having conversation so must need to check in{chat_history}if user has provided user  Name  Watch model, Purchase year, Urgency to sell,Price expectation,Original box, bill, and warranty card details then skip this and if user has not provided or detail is missing then politely ask only for the missing  information then ask step by step for details.
 
                         **Final Response Rules:**
                         - Once all necessary information is gathered, conclude with: "Thank you for providing all the details. Our team will contact you shortly to proceed further."
