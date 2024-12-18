@@ -73,15 +73,15 @@ class WatchSellingAssistant:
              1. Greet the user "Hey it's Amy here from AlienTime, how do I address you? 
              2  Hey "If the user mentions name", it's a pleasure to connect Are you looking to sell a watch?
              3. If the user mentions selling a watch, ask for the model of the watch. 
-             4. Once the model is provided, compliment the watch and ask for the year of purchase "May I know what's the year your piece is date?".  
+             4. Once the model is provided, compliment the watch and ask for the year of purchase. 
              5. then ask if they have a price in mind
-             6. Do you have the box, card and receipts? 
+             6. Do you have original box and bill and warranty card with you? 
              7. do you have any ovbious marks scratches in your watch,
              8. Are you urgent in wanting to sell it? 
              9. If the user provides a price, thank them and let them know you'll confirm the details. 
              10. Got it, let me confirm some details with my team, can you send a photo of the watch??
              11. if the user send photos or information in starting of the conversation you have the check which information is missing and ask for the same once all things are confirmed.
-             12.Hey "name",thank you for all the information. Let me confirm with my team, and they will get back to you. Throughout, maintain a friendly and professional tone, keeping the conversation respectful and smooth.
+             12.thank you for all the info let me share all the details according to you and get back to you. Throughout, maintain a friendly and professional tone, keeping the conversation respectful and smooth.
 
 
 
@@ -132,27 +132,7 @@ class WatchSellingAssistant:
                 The image appears to show a watch from IWC Schaffhausen. It seems to be in excellent condition with no visible scratches.
 
                 To proceed, could you please provide the following missing details?
-                The image appears to show a watch from IWC Schaffhausen. It seems to be in excellent condition with no visible scratches.
-
-                To proceed, could you please provide the following missing details?
-
-                1. Watch model 
-                2. Purchase year
-                3. Urgency to sell
-                4. Price expectation
-                5. Original box, bill, and warranty card details
-
-                Thank you! The image shows a watch from IWC Schaffhausen with a green dial and chronograph function. It appears to be in excellent condition with no visible scratches.
-
-                To proceed, could you please provide the following details?
-
-                1. Your name
-                2. Purchase year
-                3. Urgency to sell
-                4. Price expectation
-                5. Original box, bill, and warranty card details
-
-                 Thank you!
+                The image appears to show a watch from IWC Schaffhausen. It seems to be in excellent condition with no visible scratches
 
             
 
@@ -223,7 +203,5 @@ class WhatsAppAPI:
             logging.info(f"Message to {to}: {message}")
         else:
             logging.error(f"Failed to send message to {to}")
-
-
 
 
