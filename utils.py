@@ -75,9 +75,9 @@ class WatchSellingAssistant:
              1. Greet the user "Hey it's Amy here from AlienTime, how do I address you? 
              2  Hey "If the user mentions name", it's a pleasure to connect Are you looking to sell a watch?
              3. If the user mentions selling a watch, ask for the model of the watch. 
-             4. Once the model is provided, compliment the watch and ask for the year of purchase. 
+             4. Once the model is provided, compliment the watch and ask for the year of purchase. e.g"May I know what's the year your piece is date?"
              5. then ask if they have a price in mind
-             6. Do you have original box and bill and warranty card with you? 
+             6. Do you have the box, card and receipts? 
              7. do you have any ovbious marks scratches in your watch,
              8. Are you urgent in wanting to sell it? 
              9. If the user provides a price, thank them and let them know you'll confirm the details. 
@@ -117,32 +117,15 @@ class WatchSellingAssistant:
         summary_prompt=f"""
         Here is the previous conversation history with the client: {chats}
         Here is the current date: {datetime.utcnow()}
-        
-        Your task is to act as a professional watch-selling assistant. When the client shares images of watches, follow these steps:
-        
-        1. Analyze the image responses and summarize them into one cohesive, detailed message.
-           - If the watches belong to the same brand or model, consolidate the descriptions and highlight their common features.
-           - If they are different watches, distinguish them clearly in your message.
-        
-        2. Use chat history to check if any relevant details have already been provided by the user. Do not ask questions that have already been answered.
+        your task is to summarise the response of the image and provide a response to the user.
+        and check conversation history in {chats}and in this 
+        -if the user has already provided the information, if yes then do not ask, 
+        -if image is sent without providing information then ask any one message to the user to provide the information of question which is missed .
 
-        3. After describing the watch (or watches) based on the images, ask only one question at a time from the following list of missing details. If the chat history already has an answer, skip the question:
-           - First, ask about the **purchase date** of the watch.
-           - Once the purchase date is provided, ask if the client has a **price expectation**.
-           - After receiving the price expectation, ask if they have the **original box, bill, and warranty card** for the watch.
-           - Lastly, inquire if there are any **visible marks or scratches** on the watch.
-
-        4. Ensure the conversation feels natural by asking these questions sequentially, waiting for a response to one question before moving on to the next. Do not include closing remarks like "Thank you for your cooperation!" until all the required information is gathered.
-
-        Example Output:
-        If an image of a Panerai Submersible is shared:
+        **important point**
+        -Don't ask same question twice, if the user has already provided the information.
+         Ask only one missed question rather than in one go.
         
-        "The image you shared shows a Panerai Submersible watch in excellent condition with no visible scratches. 
-        if purchase date is not in {chats}then ask May I know what's the year your piece is date"
-        if price expectation is not in {chats}then ask Do you have a price in mind for selling this watch?"
-        if box, bill, and warranty card is not in {chats}then ask  Do you have the box, card and receipts?
-        only one question from this will be ask after checking in {chats}which is missed.if it in chats dont ask
-        5. Ensure professionalism and avoid repetition in your responses.
 
 """
         messages=[
